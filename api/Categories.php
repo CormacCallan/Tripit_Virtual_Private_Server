@@ -11,12 +11,12 @@ function assignCategory(&$preference1, &$preference2, &$preference3, &$fieldType
     $preferences = array($preference1,$preference2,$preference3);
     
     foreach($preferences as $pref){
-        if($pref == "Food")
-            {
-            $foodArray = array("Food" => array("cafe"));
-            array_push($fieldTypes, $foodArray);
-        }
-        else if($pref == "History")
+//        if($pref == "Food")
+//            {
+//            $foodArray = array("Food" => array("cafe"));
+//            array_push($fieldTypes, $foodArray);
+//        }
+         if($pref == "History")
             {
             $historyArray = array("History" => array("city_hall","courthouse","museum"));
             //"university"

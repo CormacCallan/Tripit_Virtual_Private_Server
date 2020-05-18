@@ -7,8 +7,10 @@ class Database{
     private $host = "localhost";
     private $db_name = "tripit";
     private $username = "root";
-    private $password = "rhd3Z1nBaVUm"; //server
-    //private $password = ""; //local
+    private $password = ""; //server
+    
+    
+//private $password = ""; //local
     public $conn;
 
     // get the database connection

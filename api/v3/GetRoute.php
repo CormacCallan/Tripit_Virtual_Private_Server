@@ -9,27 +9,150 @@ $_SESSION["URL_PREFERENCE_3"] = $_GET['pref3'];
 $_SESSION["URL_USER_TIME"] = $_GET['time'];
 
 
+include_once '../Credentials.php';
+include_once '../Place.php';
+include_once '../Categories.php';
+include_once '../Blacklist.php';
+include_once 'database.php';
+//utilities
+include_once '../../resources/utilities/utility.php';
+include_once '../v2/v2_handler.php';
+
+
+
+$database = new Database();
+$db = $database->getConnection();
+
+try {
+    if ($_SESSION["URL_USER_TIME"] = 69) {
+        automateHTTPRequest();
+    } else {
+        if ($_SESSION["URL_PREFERENCE_1"] || empty($_SESSION["URL_PREFERENCE_2"]) || empty($_SESSION["URL_PREFERENCE_3"])) {
+            populatePreferences();
+        } else {
+            printHTTPRequest();
+        }
+    }
+} catch (Exception $ex) {
+    echo 'TRIPIT_DEV: Failed to parse URL\nCaught exception: ', $e->getMessage(), "\n";
+}
+
+$p1 = $_SESSION["URL_PREFERENCE_1"];
+$p2 = $_SESSION["URL_PREFERENCE_2"];
+$p3 = $_SESSION["URL_PREFERENCE_3"];
+
+$preferences = array($p1, $p2, $p3);
+
+//Putting all field types into a single array to make API call easier.
+$fieldTypesForAPI = array();
+
+//An array that will contain Places API field types that match the preferences above.
+$fieldTypes = array();
+//Populating the Array
+assignCategory($p1, $p2, $p3, $fieldTypes);
+
+
+
+
+
+//Array with 
+$placesArray = array();
+include '../QueryPlaceAPI.php';
+
+
+
+//print_r($placesArray);
+
+//insert($placesArray, $db);
+
 
 
 function br(){echo "<br>";}
 
 
+$PlaceObjectArray = array();
 
-try {
-    if ($_SESSION["URL_PREFERENCE_1"]|| empty($_SESSION["URL_PREFERENCE_2"]) || empty($_SESSION["URL_PREFERENCE_3"]) ) {
-        populatePreferences();
-        echo "populated preferecens";
-        printHTTPRequest();
-    } else {
-        echo "continuing as normal";
-        printHTTPRequest();
+function insert(&$placesArray, &$db){
+
+    for ($i = 0; $i < count($placesArray) ; $i ++) {
+        $place_id = $placesArray[$i]->place_id;
+        $place_name = $placesArray[$i]->place_name;
+        $place_type = $placesArray[$i]->place_type;
+        $place_rating = $placesArray[$i]->rating;
+        $place_lat = $placesArray[$i]->latitude;
+        $place_lng = $placesArray[$i]->longitude;
+        $place_icon = $placesArray[$i]->icon;
+        $place_open = $placesArray[$i]->open;
+        $place_cover_image = $placesArray[$i]->cover_image;
+        $place_average_time = $placesArray[$i]->average_time;
+                
+
+        $stmtCheck = $db->prepare('SELECT * FROM places WHERE place_id=?');
+        $stmtCheck->bindParam(1, $place_id, PDO::PARAM_STR);
+        $stmtCheck->fetch(PDO::FETCH_ASSOC);
+        $stmtCheck->execute();
+        
+        if($stmtCheck->rowCount() < 1){
+            $query = "INSERT INTO places (place_id,place_name,place_type,place_rating,place_lat,place_lng,place_icon,place_open,place_cover_image,place_average_time) "
+                    . "VALUES ('$place_id','$place_name','$place_type','$place_rating','$place_lat','$place_lng','$place_icon','$place_open','$place_cover_image','$place_average_time')";
+            
+            $stmtInsert = $db->prepare($query);
+            $stmtInsert->bindParam(":place_id", $place_id);
+            $stmtInsert->bindParam(":place_name", $place_name);
+            $stmtInsert->bindParam(":place_type", $place_type);
+            $stmtInsert->bindParam(":place_rating", $place_rating);
+            $stmtInsert->bindParam(":place_lat", $place_lat);
+            $stmtInsert->bindParam(":place_lng", $place_lng);
+            $stmtInsert->bindParam(":place_icon", $place_icon);
+            $stmtInsert->bindParam(":place_open", $place_open);
+            $stmtInsert->bindParam(":place_cover_image", $place_cover_image);
+            $stmtInsert->bindParam(":place_average_time", $place_average_time);
+
+            $stmtInsert->execute(); 
+        }
+        else{
+            echo "<br>Duplicate Found - Insert Skipped.";
+        }
+       
+        
     }
-} catch (Exception $ex) {
-    echo 'TRIPIT_DEV: Failed to parse URL\nCaught exception: ',  $e->getMessage(), "\n";
+    
 }
 
 
 
+function extract1(&$db, &$PlaceObjectArray){
+    //echo "extracting";
+        $stmtCheck = $db->prepare('SELECT * FROM places LIMIT 10');
+        $stmtCheck->fetch(PDO::FETCH_ASSOC);
+        $stmtCheck->execute();
+        
+    while ($row = $stmtCheck->fetch()) {
+        $place_id = $row['place_id'];
+        $place_name = $row['place_name'];
+        $place_type = $row['place_type'];
+        $place_rating = $row['place_rating'];
+        $place_lat = $row['place_lat'];
+        $place_lng = $row['place_lng'];
+        $place_icon = $row['place_icon'];
+        $place_open = $row['place_open'];
+        $place_cover_image = $row['place_cover_image'];
+        $place_average_time = $row['place_average_time'];
+        
+        $Place_Object = new Place($place_id, $place_name,$place_type, $place_rating, $place_lat, $place_lng,  $place_icon, $place_open, $place_cover_image,$place_average_time);
+        $Place_Object->setCoverImage($place_cover_image);
+        $Place_Object->setAverageTime($place_average_time);
+        array_push($PlaceObjectArray,$Place_Object);
+    }
+   
+}
+
+
+
+extract1($db,$PlaceObjectArray);
+$arrayObjectTitle = "PlaceObject";
+
+returnJsonToClient($arrayObjectTitle, $PlaceObjectArray);
 
 
 /*
@@ -96,27 +219,26 @@ function populatePreferences(){
     $_SESSION["URL_PREFERENCE_2"] = $URL_pref[1];
     $_SESSION["URL_PREFERENCE_3"] = $URL_pref[2];
     
-    
-
+   
     //Continue with the program as normal, as if the correct amount of values where passed originally.
-    //parseHTTPRequest();
 }
 
 
-function automateHTTPRequest(&$latitude, &$longitude, &$preference1, &$preference2, &$preference3, &$userTime){
-    echo "running default";
-    $latitude =  "53.997945";
-    $longitude =  "-6.4059567";
-    $preference1 =  "Food";
-    $preference2 =  "History";
-    $preference3 = "Entertainment";
-    $userTime =  240;
+function automateHTTPRequest(){
+    //echo "TEST MODE -> Dundalk Town Square";
+    $_SESSION["URL_LATITUDE"] =  "53.997945";
+    $_SESSION["URL_LONGITUDE"]=  "-6.4059567";
+    $_SESSION["URL_PREFERENCE_1"] =  "Food";
+    $_SESSION["URL_PREFERENCE_2"] =  "History";
+    $_SESSION["URL_PREFERENCE_3"] = "Entertainment";
+    $_SESSION["URL_USER_TIME"] =  240;
+    
 }
 
 
 function printHTTPRequest(){
     echo "<br>Printing Request";
-    echo "<br>LAT -> ". $_SESSION["URL_LATITUDE"] . "<br>LNG -> " . $_SESSION["URL_LONGITUDE"] . "<br>". $_SESSION["URL_PREFERENCE_1"] . ", " . $_SESSION["URL_PREFERENCE_2"] . ", " . $_SESSION["URL_PREFERENCE_3"] . "<br>MINs ->" . $_SESSION["URL_USER_TIME"];
+    echo "<br>LAT -> ". $_SESSION["URL_LATITUDE"] . "<br>LNG -> " . $_SESSION["URL_LONGITUDE"] . "<br>". $_SESSION["URL_PREFERENCE_1"] . ", " . $_SESSION["URL_PREFERENCE_2"] . ", " . $_SESSION["URL_PREFERENCE_3"] . "<br>MINs ->";// . $_SESSION["URL_USER_TIME"];
 }
 
 session_destroy();

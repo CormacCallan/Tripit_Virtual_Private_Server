@@ -1,6 +1,7 @@
 create Database Places;
 
 
+
 create table places (
     tripit_id int(5) AUTO_INCREMENT PRIMARY KEY,
     place_id VARCHAR(30) NOT NULL,
@@ -11,6 +12,6 @@ create table places (
     place_lng VARCHAR (15) NOT NULL,
     place_icon VARCHAR (1000) NOT NULL,
     place_open VARCHAR (15),
-    place_cover_iamge VARCHAR (1000),
-    place_average_time (4) VARCHAR
+    place_cover_image VARCHAR (1000),
+    place_average_time VARCHAR (4) 
 )

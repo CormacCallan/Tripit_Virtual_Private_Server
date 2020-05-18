@@ -5,6 +5,12 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
+header("Access-Control-Allow-Origin: *");
+header("Content-Type: application/json; charset=UTF-8");
+header("Access-Control-Allow-Methods: POST");
+header("Access-Control-Max-Age: 3600");
+header("Access-Control-Allow-Headers: Content-Type, Access-Control-Allow-Headers, Authorization, X-Requested-With");
+
 
 include_once '../Credentials.php';
 
@@ -18,39 +24,44 @@ foreach ($fieldTypes as $key => $value) {
         // $category is Food/Sport/AfterDark etc
         foreach ($items as $inner_key => $item) {
             array_push($fieldTypesForAPI, $item);
+            //echo  "<br>here<br>" .$item;
         }
     }
 }
 
 
+//print_r($fieldTypesForAPI);
 
 
 
-
-for($i = 0; $i < count($fieldTypesForAPI); $i++){
+for($i = 0; $i < 1; $i++){
     
-        
-        $URL = "https://maps.googleapis.com/maps/api/place/nearbysearch/json?location=". $lat . "," . $lng . "&type=" . $fieldTypesForAPI[$i] . "&rankby=distance" . "&key=" . $_SESSION["PLACES_API_KEY"];
+        //echo "</br>Requests</br>";
+        //echo $URL = "https://maps.googleapis.com/maps/api/place/nearbysearch/json?location=". $_SESSION["URL_LATITUDE"] . "," . $_SESSION["URL_LONGITUDE"] . "&rankby=distance&type=" . $fieldTypesForAPI[$i]  . "&key=" . $_SESSION["PLACES_API_KEY"];
+        //echo "</br>";
+        $URL  = "https://maps.googleapis.com/maps/api/place/textsearch/json?query=Courthouse+in+Dundalk&location=42.3675294,-71.186966&radius=10000&key=AIzaSyBWybtApBsH98-1jOht7uh82w_2pJW1vKw";
         
         $APIresult = file_get_contents($URL);
 
-        parseAPIResult($placesArray,$APIresult);
-
+        parseAPIResult($placesArray,$APIresult, $db);
+        
         //echo "<pre>";  print_r($APIresult); echo "</pre>";
+        
 }
 
 
 
-function parseAPIResult(&$placesArray, &$api_result){
+function parseAPIResult(&$placesArray, &$api_result, &$db){
     
+
     
         if($api_result !== false){
         $json_data = json_decode($api_result, true);
-
+         
      
           
       
-        for($i = 0; $i < 6; $i++){     
+        for($i = 0; $i < 7; $i++){     
 
             //Validating JSON Object to ensure all fields are present.
             
@@ -160,10 +171,20 @@ function parseAPIResult(&$placesArray, &$api_result){
                 $Place_Object->setAverageTime($average_time);
                 array_push($placesArray,$Place_Object);
                 
+                //print_r($placesArray);
+                //echo "<br>insertin to DB";
+
+//                $query = "INSERT INTO places  SET  place_id=:place_id, place_name=:place_name, place_type:place_type, place_rating:place_rating, place_lat:place_lat, place_lng:place_lng, place_icon:place_icon, place_open:place_open, place_cover_image:place_cover_image, place_average_time:place_average_time";
+//                $query = "INSERT INTO places (place_id,place_name, place_type, place_rating, place_lat, place_lng, place_icon, place_open, place_cover_image, place_average_time) "
+//                        . "VALUES (?,?,?,?,?,?,?,?,?,?)";
+
+
             }
             
         }
 
+            
+        
     }
     
 }

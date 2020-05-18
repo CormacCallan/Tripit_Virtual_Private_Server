@@ -7,40 +7,52 @@ header("Access-Control-Allow-Credentials: true");
 header('Content-Type: application/json');
 
 include_once 'database.php';
+include_once '../Credentials.php';
+include_once '../Place.php';
+include_once '../Categories.php';
+include_once '../Blacklist.php';
+
 $database = new Database();
 $db = $database->getConnection();
 
 
-//For loop that will call the Places API for each field type above and call the create place object function.
-foreach ($fieldTypes as $key => $value) {
-    foreach ($value as $category => $items) {
-        // $category is Food/Sport/AfterDark etc
-        foreach ($items as $inner_key => $item) {
-            array_push($fieldTypesForAPI, $item);
-        }
-    }
-}
+
+$lat = "53.997945";
+
+$lng = "-6.4059567";
+
+$pref1 = "Food";
+
+$pref2 = "History";
+
+$pref3 = "Entertainment";
+
+$time = 240;
+
+
+//Google Places API
+$_SESSION["PLACES_API_KEY"]= "AIzaSyBWybtApBsH98-1jOht7uh82w_2pJW1vKw";
 
 
 
 
+$type = "cafe";
 
 
-for($i = 0; $i < count($fieldTypesForAPI); $i++){
     
         
-        $URL = "https://maps.googleapis.com/maps/api/place/nearbysearch/json?location=". $lat . "," . $lng . "&type=" . $fieldTypesForAPI[$i] . "&rankby=distance" . "&key=" . $_SESSION["PLACES_API_KEY"];
+        $URL = "https://maps.googleapis.com/maps/api/place/nearbysearch/json?location=". $lat . "," . $lng . "&type=" .  $type  . "&rankby=distance" . "&key=" . $_SESSION["PLACES_API_KEY"];
         
         $APIresult = file_get_contents($URL);
 
-        parseAPIResult($placesArray,$APIresult);
+        parseAPIResult($APIresult);
 
-        //echo "<pre>";  print_r($APIresult); echo "</pre>";
-}
-
+        echo "<pre>";  print_r($APIresult); echo "</pre>";
 
 
-function parseAPIResult(&$placesArray, &$api_result){
+
+$dbcount = 0;
+function parseAPIResult(&$api_result){
     
     
         if($api_result !== false){
@@ -153,21 +165,38 @@ function parseAPIResult(&$placesArray, &$api_result){
                //skip place 
             }
             else {
-
+                echo "<br>creating place object";
                 $Place_Object = new Place($place_id, $place_name, $place_type, $rating, $latitude, $longitude, $icon, $open, $cover_image, $average_time);
                 $Place_Object->setCoverImage($cover_image);
                 $Place_Object->setAverageTime($average_time);
                 array_push($placesArray, $Place_Object);
-
-
+                
+                print_r($placesArray);
+                echo "<br>insertin to DB";
                 // query to insert record
                 //$query = "INSERT INTO activities  SET  place_id=:place_id, place_name=:place_name, place_type:place_type, place_rating:place_rating, place_lat:place_lat, place_lng:place_lng, place_icon:place_icon, place_open:place_open, place_cover_image:place_cover_image, place_average_time:place_average_time";
-                $query = "INSERT INTO activities (place_id,place_name, place_type, place_rating, place_lat, place_lng, place_icon, place_open, place_cover_image, place_average_time) "
-                        . "VALUES (?,?,?,?,?,?,?,?,?,?)";
-                // prepare query
-                $stmt = $pdo->prepare($query);
-                $stmt->execute([$place_id, $place_name, $place_type,$rating,$latitude,$longitude,$icon,$open,$cover_image,$average_time]);
-                // sanitize
+//                $query = "INSERT INTO activities (place_id,place_name, place_type, place_rating, place_lat, place_lng, place_icon, place_open, place_cover_image, place_average_time) "
+//                        . "VALUES (?,?,?,?,?,?,?,?,?,?)";
+//
+//                                $query = "INSERT INTO activities (place_id) "
+//                        . "VALUES (?)";
+//                // prepare query
+//                $stmt = $pdo->prepare($query);
+//                $stmt->execute([$place_id]);
+//               echo "<br>completed";
+                
+                        $sql = "insert into places (place_id) values (1234) ";
+
+    
+   
+         $stmt = $db->prepare($sql);
+    
+
+  
+
+        // execute query
+        $stmt->execute();
+                
             }
             
         }
