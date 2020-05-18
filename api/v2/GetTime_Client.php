@@ -6,18 +6,15 @@
  * and open the template in the editor.
  */
 
-//$originLat =  htmlspecialchars($_GET["originLat"]);
-//$originLng =  htmlspecialchars($_GET["originLng"]);
-//$destinationLat =  htmlspecialchars($_GET["destinationLat"]);
-//$destinationLng =  htmlspecialchars($_GET["destinationLng"]);
+$originLat =  htmlspecialchars($_GET["originLat"]);
+$originLng =  htmlspecialchars($_GET["originLng"]);
+$destinationLat =  htmlspecialchars($_GET["destinationLat"]);
+$destinationLng =  htmlspecialchars($_GET["destinationLng"]);
 
 include_once  '../QueryRouteAPI.php';
 
-//
-$originLat = "54.0045042";
-$originLng = "-6.3979302";
-$destinationLat = "54.0045329";
-$destinationLng = "-6.4013169";
+
+
 
 
 
