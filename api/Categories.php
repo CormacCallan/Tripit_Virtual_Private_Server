@@ -11,25 +11,25 @@ function assignCategory(&$preference1, &$preference2, &$preference3, &$fieldType
     $preferences = array($preference1,$preference2,$preference3);
     
     foreach($preferences as $pref){
-//        if($pref == "Food")
-//            {
-//            $foodArray = array("Food" => array("cafe"));
-//            array_push($fieldTypes, $foodArray);
-//        }
+        if($pref == "Food")
+            {
+            $foodArray = array("Food" => array("cafe"));
+            array_push($fieldTypes, $foodArray);
+        }
          if($pref == "History")
             {
-            $historyArray = array("History" => array("city_hall","courthouse","museum"));
+            $historyArray = array("History" => array("city+hall","courthouse","museum"));
             //"university"
             array_push($fieldTypes, $historyArray);
         }
         else if($pref == "Leisure")
             {
-            $leisureArray = array("Leisure" => array("amusement_park","aquarium","park","zoo"));
+            $leisureArray = array("Leisure" => array("amusement+park","aquarium","park","zoo"));
             array_push($fieldTypes, $leisureArray);
         }
         else if($pref == "Entertainment")
             {
-            $entertainmentArray = array("Entertainment" => array("bowling_alley","movie_theater"));
+            $entertainmentArray = array("Entertainment" => array("bowling+alley","movie_theater"));
             array_push($fieldTypes, $entertainmentArray);
         }
         else if($pref == "Sport")
@@ -39,17 +39,17 @@ function assignCategory(&$preference1, &$preference2, &$preference3, &$fieldType
         }
         else if($pref == "PopularPlaces")
             {
-            $popularPlacesArray = array("PopularPlaces" => array("tourist_attraction"));
+            $popularPlacesArray = array("PopularPlaces" => array("tourist+attraction"));
             array_push($fieldTypes, $popularPlacesArray);
         }
         else if($pref == "AfterDark")
             {
-            $afterDarkArray = array("AfterDark" => array("bar","casino","night_club"));
+            $afterDarkArray = array("AfterDark" => array("bar","casino","night+club"));
             array_push($fieldTypes, $afterDarkArray);
         }
         else if($pref == "Arts_Culture")
             {
-            $arts_cultureArray =  array("Arts_Culture" => array("art_gallery","library"));
+            $arts_cultureArray =  array("Arts_Culture" => array("art+gallery","library"));
             //"university"
             array_push($fieldTypes, $arts_cultureArray);
         }

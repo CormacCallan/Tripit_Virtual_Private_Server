@@ -34,12 +34,12 @@ foreach ($fieldTypes as $key => $value) {
 
 
 
-for($i = 0; $i < 1; $i++){
+for($i = 0; $i < count($fieldTypesForAPI); $i++){
     
         //echo "</br>Requests</br>";
         //echo $URL = "https://maps.googleapis.com/maps/api/place/nearbysearch/json?location=". $_SESSION["URL_LATITUDE"] . "," . $_SESSION["URL_LONGITUDE"] . "&rankby=distance&type=" . $fieldTypesForAPI[$i]  . "&key=" . $_SESSION["PLACES_API_KEY"];
         //echo "</br>";
-        $URL  = "https://maps.googleapis.com/maps/api/place/textsearch/json?query=Courthouse+in+Dundalk&location=42.3675294,-71.186966&radius=10000&key=AIzaSyBWybtApBsH98-1jOht7uh82w_2pJW1vKw";
+        //echo $URL  = "https://maps.googleapis.com/maps/api/place/textsearch/json?query=".$fieldTypesForAPI[$i] . "+in+Dundalk&radius=1000&key=AIzaSyBWybtApBsH98-1jOht7uh82w_2pJW1vKw";
         
         $APIresult = file_get_contents($URL);
 

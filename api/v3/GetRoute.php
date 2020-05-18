@@ -24,7 +24,7 @@ $database = new Database();
 $db = $database->getConnection();
 
 try {
-    if ($_SESSION["URL_USER_TIME"] = 69) {
+    if ($_SESSION["URL_USER_TIME"] == 69) {
         automateHTTPRequest();
     } else {
         if ($_SESSION["URL_PREFERENCE_1"] || empty($_SESSION["URL_PREFERENCE_2"]) || empty($_SESSION["URL_PREFERENCE_3"])) {
@@ -43,6 +43,8 @@ $p3 = $_SESSION["URL_PREFERENCE_3"];
 
 $preferences = array($p1, $p2, $p3);
 
+print_r($preferences);
+
 //Putting all field types into a single array to make API call easier.
 $fieldTypesForAPI = array();
 
@@ -57,11 +59,11 @@ assignCategory($p1, $p2, $p3, $fieldTypes);
 
 //Array with 
 $placesArray = array();
-include '../QueryPlaceAPI.php';
+//include '../QueryPlaceAPI.php';
 
 
 
-//print_r($placesArray);
+
 
 //insert($placesArray, $db);
 
@@ -121,38 +123,45 @@ function insert(&$placesArray, &$db){
 
 
 
-function extract1(&$db, &$PlaceObjectArray){
-    //echo "extracting";
-        $stmtCheck = $db->prepare('SELECT * FROM places LIMIT 10');
+function extract1(&$db, &$PlaceObjectArray, &$preferences){
+    
+    
+    foreach($preferences as $i){
+ 
+        $stmtCheck = $db->prepare('SELECT * FROM places WHERE place_type=?');
+        $stmtCheck->bindParam(1, $i, PDO::PARAM_STR);
         $stmtCheck->fetch(PDO::FETCH_ASSOC);
         $stmtCheck->execute();
         
-    while ($row = $stmtCheck->fetch()) {
-        $place_id = $row['place_id'];
-        $place_name = $row['place_name'];
-        $place_type = $row['place_type'];
-        $place_rating = $row['place_rating'];
-        $place_lat = $row['place_lat'];
-        $place_lng = $row['place_lng'];
-        $place_icon = $row['place_icon'];
-        $place_open = $row['place_open'];
-        $place_cover_image = $row['place_cover_image'];
-        $place_average_time = $row['place_average_time'];
+        while ($row = $stmtCheck->fetch()) {
+            $place_id = $row['place_id'];
+            $place_name = $row['place_name'];
+            $place_type = $row['place_type'];
+            $place_rating = $row['place_rating'];
+            $place_lat = $row['place_lat'];
+            $place_lng = $row['place_lng'];
+            $place_icon = $row['place_icon'];
+            $place_open = $row['place_open'];
+            $place_cover_image = $row['place_cover_image'];
+            $place_average_time = $row['place_average_time'];
+
+            $Place_Object = new Place($place_id, $place_name,$place_type, $place_rating, $place_lat, $place_lng,  $place_icon, $place_open, $place_cover_image,$place_average_time);
+            $Place_Object->setCoverImage($place_cover_image);
+            $Place_Object->setAverageTime($place_average_time);
+            array_push($PlaceObjectArray,$Place_Object);
+        }
         
-        $Place_Object = new Place($place_id, $place_name,$place_type, $place_rating, $place_lat, $place_lng,  $place_icon, $place_open, $place_cover_image,$place_average_time);
-        $Place_Object->setCoverImage($place_cover_image);
-        $Place_Object->setAverageTime($place_average_time);
-        array_push($PlaceObjectArray,$Place_Object);
     }
-   
+
 }
 
 
 
-extract1($db,$PlaceObjectArray);
-$arrayObjectTitle = "PlaceObject";
-
-returnJsonToClient($arrayObjectTitle, $PlaceObjectArray);
+extract1($db,$PlaceObjectArray, $preferences);
+//$arrayObjectTitle = "PlaceObject";
+//print_r($PlaceObjectArray);
+outputJsonTidy($PlaceObjectArray);
+//returnJsonToClient($arrayObjectTitle, $PlaceObjectArray);
 
 
 /*
