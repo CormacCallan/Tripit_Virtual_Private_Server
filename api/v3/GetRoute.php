@@ -194,9 +194,9 @@ extractFromDatabase($db,$PlaceObjectArray, $preferences);
 getTimeToPlace($PlaceObjectArray,$arrayToClient);
 
 $arrayObjectTitle = "PlaceObject";
-outputJsonTidy($arrayToClient);
+//outputJsonTidy($arrayToClient);
 
-//returnJsonToClient($arrayObjectTitle, $arrayToClient);
+returnJsonToClient($arrayObjectTitle, $arrayToClient);
 
 
 
