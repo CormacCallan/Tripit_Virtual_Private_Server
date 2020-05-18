@@ -145,7 +145,7 @@ function extractFromDatabase(&$db, &$PlaceObjectArray, &$preferences){
             $place_average_time = $row['place_average_time'];
 
             $Place_Object = new Place($place_id, $place_name,$place_type, $place_rating, $place_lat, $place_lng,  $place_icon, $place_open, $place_cover_image,$place_average_time);
-            $Place_Object->setCoverImage($place_cover_image);
+            //$Place_Object->setCoverImage($place_cover_image);
             $Place_Object->setAverageTime($place_average_time);
             array_push($PlaceObjectArray,$Place_Object);
         }
@@ -194,9 +194,9 @@ extractFromDatabase($db,$PlaceObjectArray, $preferences);
 getTimeToPlace($PlaceObjectArray,$arrayToClient);
 
 $arrayObjectTitle = "PlaceObject";
-//print_r($arrayToClient);
+outputJsonTidy($arrayToClient);
 
-returnJsonToClient($arrayObjectTitle, $arrayToClient);
+//returnJsonToClient($arrayObjectTitle, $arrayToClient);
 
 
 
