@@ -7,7 +7,7 @@ class Database{
     private $host = "localhost";
     private $db_name = "tripit";
     private $username = "root";
-    private $password = ""; //server
+    private $password = "rhd3Z1nBaVUm"; //server
     
     
 //private $password = ""; //local
