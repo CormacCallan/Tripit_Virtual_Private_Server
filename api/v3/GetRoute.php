@@ -13,6 +13,7 @@ include_once '../Credentials.php';
 include_once '../Place.php';
 include_once '../Categories.php';
 include_once '../Blacklist.php';
+include_once './GetTime.php';
 include_once 'database.php';
 //utilities
 include_once '../../resources/utilities/utility.php';
@@ -43,7 +44,6 @@ $p3 = $_SESSION["URL_PREFERENCE_3"];
 
 $preferences = array($p1, $p2, $p3);
 
-//print_r($preferences);
 
 //Putting all field types into a single array to make API call easier.
 $fieldTypesForAPI = array();
@@ -62,6 +62,7 @@ $placesArray = array();
 //include '../QueryPlaceAPI.php';
 
 
+//echo "</br>User TIME = " . $_SESSION['URL_USER_TIME'] . "</br>";
 
 
 
@@ -69,7 +70,6 @@ $placesArray = array();
 
 
 
-function br(){echo "<br>";}
 
 
 $PlaceObjectArray = array();
@@ -123,8 +123,7 @@ function insert(&$placesArray, &$db){
 
 
 
-function extract1(&$db, &$PlaceObjectArray, &$preferences){
-    
+function extractFromDatabase(&$db, &$PlaceObjectArray, &$preferences){
     
     foreach($preferences as $i){
  
@@ -157,11 +156,59 @@ function extract1(&$db, &$PlaceObjectArray, &$preferences){
 
 
 
-extract1($db,$PlaceObjectArray, $preferences);
-$arrayObjectTitle = "PlaceObject";
-//print_r($PlaceObjectArray);
+$arrayToClient = array();
 
-returnJsonToClient($arrayObjectTitle, $PlaceObjectArray);
+function getTimeToPlace(&$PlaceObjectArray, &$arrayToClient){
+    $summaryTime = 0;
+    
+    for($i = 0; $i < count($PlaceObjectArray) - 1; $i ++){
+    
+
+        
+        $walkingTime = findWalkingTimeV3($PlaceObjectArray[$i]->latitude, $PlaceObjectArray[$i]->longitude, $PlaceObjectArray[$i + 1]->latitude, $PlaceObjectArray[$i + 1]->longitude);
+        $activityTime = $PlaceObjectArray[$i]->average_time;
+
+        $tempTime = $activityTime + $walkingTime;
+
+        $summaryTime = $tempTime + $summaryTime;
+
+        if ($summaryTime < $_SESSION['URL_USER_TIME']) {
+            array_push($arrayToClient, $PlaceObjectArray[$i]);
+        } else {
+            //echo "not adding anymore";
+        }
+        
+
+        //echo "</br>->: ". $PlaceObjectArray[$i]->place_id  . " walking = ". $walkingTime . " + avg time " . $activityTime ."  total = " . $tempTime ." </br>"; 
+        
+        
+        
+    }
+    
+    //echo "</br></br>" . $summaryTime;
+}
+
+
+
+extractFromDatabase($db,$PlaceObjectArray, $preferences);
+getTimeToPlace($PlaceObjectArray,$arrayToClient);
+
+$arrayObjectTitle = "PlaceObject";
+//print_r($arrayToClient);
+
+returnJsonToClient($arrayObjectTitle, $arrayToClient);
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 /*
