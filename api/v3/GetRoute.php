@@ -43,7 +43,7 @@ $p3 = $_SESSION["URL_PREFERENCE_3"];
 
 $preferences = array($p1, $p2, $p3);
 
-print_r($preferences);
+//print_r($preferences);
 
 //Putting all field types into a single array to make API call easier.
 $fieldTypesForAPI = array();
@@ -158,10 +158,10 @@ function extract1(&$db, &$PlaceObjectArray, &$preferences){
 
 
 extract1($db,$PlaceObjectArray, $preferences);
-//$arrayObjectTitle = "PlaceObject";
+$arrayObjectTitle = "PlaceObject";
 //print_r($PlaceObjectArray);
-outputJsonTidy($PlaceObjectArray);
-//returnJsonToClient($arrayObjectTitle, $PlaceObjectArray);
+
+returnJsonToClient($arrayObjectTitle, $PlaceObjectArray);
 
 
 /*
