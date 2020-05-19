@@ -173,7 +173,7 @@ function checkFoodPresent(&$preferences){
 
 function addFood(&$PlaceObjectArray,&$arrayToClient){
    $foodCount = 0; 
-    
+   shuffle($PlaceObjectArray);
     foreach($PlaceObjectArray as $place){
         
         if (!checkFoodActivityExists($foodCount)) {
