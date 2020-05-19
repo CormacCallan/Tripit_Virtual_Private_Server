@@ -217,7 +217,7 @@ function addRemaining(&$PlaceObjectArray,&$arrayToClient){
 
 function getTimeToPlace(&$PlaceObjectArray, &$arrayToClient){
     $summaryTime = 0;
-    
+    shuffle($PlaceObjectArray);
     for($i = 0; $i < count($PlaceObjectArray) - 1; $i ++){
     
 
@@ -235,17 +235,18 @@ function getTimeToPlace(&$PlaceObjectArray, &$arrayToClient){
         }
         
 
-        //echo "</br>->: ". $PlaceObjectArray[$i]->place_id  . " walking = ". $walkingTime . " + avg time " . $activityTime ."  total = " . $tempTime ." </br>"; 
+        
         
         
         
     }
     
-    //echo "</br></br>" . $summaryTime;
+
 }
 
-
-//shuffle($PlaceObjectArray);
+function orderFinalArray(){
+    
+}
 
 
 
@@ -263,6 +264,10 @@ else{
 }
 
 
+orderFinalArray();
+
+
+
 //Find out how long it takes to get to one place
 getTimeToPlace($finalArray,$arrayToClient);
 
@@ -271,8 +276,9 @@ getTimeToPlace($finalArray,$arrayToClient);
 
 $arrayObjectTitle = "PlaceObject";
 
-
-returnJsonToClient($arrayObjectTitle, $arrayToClient);
+outputJsonTidy($finalArray);
+outputJsonTidy($arrayToClient);
+//returnJsonToClient($arrayObjectTitle, $arrayToClient);
 
 
 
