@@ -28,11 +28,9 @@ try {
     if ($_SESSION["URL_USER_TIME"] == 69) {
         automateHTTPRequest();
     } else {
-        if ($_SESSION["URL_PREFERENCE_1"] || empty($_SESSION["URL_PREFERENCE_2"]) || empty($_SESSION["URL_PREFERENCE_3"])) {
+        if (empty($_SESSION["URL_PREFERENCE_1"]) || empty($_SESSION["URL_PREFERENCE_2"]) || empty($_SESSION["URL_PREFERENCE_3"])) {
             populatePreferences();
-        } else {
-            printHTTPRequest();
-        }
+        } 
     }
 } catch (Exception $ex) {
     echo 'TRIPIT_DEV: Failed to parse URL\nCaught exception: ', $e->getMessage(), "\n";
@@ -43,6 +41,7 @@ $p2 = $_SESSION["URL_PREFERENCE_2"];
 $p3 = $_SESSION["URL_PREFERENCE_3"];
 
 $preferences = array($p1, $p2, $p3);
+
 
 
 //Putting all field types into a single array to make API call easier.
@@ -73,6 +72,8 @@ $placesArray = array();
 
 
 $PlaceObjectArray = array();
+$arrayToClient = array();
+$finalArray = array();
 
 function insert(&$placesArray, &$db){
 
@@ -122,7 +123,6 @@ function insert(&$placesArray, &$db){
 }
 
 
-
 function extractFromDatabase(&$db, &$PlaceObjectArray, &$preferences){
     
     foreach($preferences as $i){
@@ -154,9 +154,66 @@ function extractFromDatabase(&$db, &$PlaceObjectArray, &$preferences){
 
 }
 
+function checkFoodPresent(&$preferences){
+   foreach($preferences as $i){
+           if($i == "Food"){
+               return true;
+               addFoodActivity();
+           }
+           else{
+               return false;
+           }
+   }
+}
+
+//function addFoodActivity(&$arrayToClient){
+//    
+//    
+//    
+//}
 
 
-$arrayToClient = array();
+
+
+function addFood(&$PlaceObjectArray,&$arrayToClient){
+   $foodCount = 0; 
+    
+    foreach($PlaceObjectArray as $place){
+        
+        
+        if (!checkFoodActivityExists($foodCount)) {
+            if ($place->place_type == "Food" && $foodCount < 2 ) {
+                $foodCount ++;
+                array_push($arrayToClient, $place);
+                
+            }
+        }
+//        else if($foodCount >= 1 && $place->place_type != "Food"){
+//                array_push($arrayToClient, $place);
+//        }
+    }
+  
+}
+
+function addRemaining(&$PlaceObjectArray,&$arrayToClient){
+    
+    foreach($PlaceObjectArray as $place){
+        
+       
+            if ($place->place_type != "Food") {
+                //echo $place->place_type;
+                array_push($arrayToClient, $place);
+
+            }
+        }
+
+}
+    
+
+
+
+
+
 
 function getTimeToPlace(&$PlaceObjectArray, &$arrayToClient){
     $summaryTime = 0;
@@ -164,7 +221,6 @@ function getTimeToPlace(&$PlaceObjectArray, &$arrayToClient){
     for($i = 0; $i < count($PlaceObjectArray) - 1; $i ++){
     
 
-        
         $walkingTime = findWalkingTimeV3($PlaceObjectArray[$i]->latitude, $PlaceObjectArray[$i]->longitude, $PlaceObjectArray[$i + 1]->latitude, $PlaceObjectArray[$i + 1]->longitude);
         $activityTime = $PlaceObjectArray[$i]->average_time;
 
@@ -189,12 +245,32 @@ function getTimeToPlace(&$PlaceObjectArray, &$arrayToClient){
 }
 
 
+//shuffle($PlaceObjectArray);
 
+
+
+//Get all the data from DB
 extractFromDatabase($db,$PlaceObjectArray, $preferences);
-getTimeToPlace($PlaceObjectArray,$arrayToClient);
+
+
+//If food was requested add a food place and continue
+if(checkFoodPresent($preferences)== true){
+    addFood($PlaceObjectArray, $finalArray);
+    addRemaining($PlaceObjectArray, $finalArray);
+}
+else{
+    addRemaining($PlaceObjectArray, $finalArray);
+}
+
+
+//Find out how long it takes to get to one place
+getTimeToPlace($finalArray,$arrayToClient);
+
+
+
 
 $arrayObjectTitle = "PlaceObject";
-//outputJsonTidy($arrayToClient);
+
 
 returnJsonToClient($arrayObjectTitle, $arrayToClient);
 
