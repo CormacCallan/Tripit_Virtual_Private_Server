@@ -276,9 +276,9 @@ getTimeToPlace($finalArray,$arrayToClient);
 
 $arrayObjectTitle = "PlaceObject";
 
-outputJsonTidy($finalArray);
-outputJsonTidy($arrayToClient);
-//returnJsonToClient($arrayObjectTitle, $arrayToClient);
+//outputJsonTidy($finalArray);
+//outputJsonTidy($arrayToClient);
+returnJsonToClient($arrayObjectTitle, $arrayToClient);
 
 
 
