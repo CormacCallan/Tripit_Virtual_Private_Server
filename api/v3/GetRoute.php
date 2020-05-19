@@ -158,10 +158,6 @@ function checkFoodPresent(&$preferences){
    foreach($preferences as $i){
            if($i == "Food"){
                return true;
-               addFoodActivity();
-           }
-           else{
-               return false;
            }
    }
 }
@@ -180,7 +176,6 @@ function addFood(&$PlaceObjectArray,&$arrayToClient){
     
     foreach($PlaceObjectArray as $place){
         
-        
         if (!checkFoodActivityExists($foodCount)) {
             if ($place->place_type == "Food" && $foodCount < 2 ) {
                 $foodCount ++;
@@ -188,32 +183,23 @@ function addFood(&$PlaceObjectArray,&$arrayToClient){
                 
             }
         }
-//        else if($foodCount >= 1 && $place->place_type != "Food"){
-//                array_push($arrayToClient, $place);
-//        }
     }
   
 }
 
-function addRemaining(&$PlaceObjectArray,&$arrayToClient){
+function addRemaining(&$PlaceObjectArray,&$finalArray){
     
     foreach($PlaceObjectArray as $place){
-        
-       
+
             if ($place->place_type != "Food") {
                 //echo $place->place_type;
-                array_push($arrayToClient, $place);
+                array_push($finalArray, $place);
 
             }
         }
 
 }
     
-
-
-
-
-
 
 function getTimeToPlace(&$PlaceObjectArray, &$arrayToClient){
     $summaryTime = 0;
@@ -233,20 +219,13 @@ function getTimeToPlace(&$PlaceObjectArray, &$arrayToClient){
         } else {
             //echo "not adding anymore";
         }
-        
 
-        
-        
-        
         
     }
     
 
 }
 
-function orderFinalArray(){
-    
-}
 
 
 
@@ -256,6 +235,7 @@ extractFromDatabase($db,$PlaceObjectArray, $preferences);
 
 //If food was requested add a food place and continue
 if(checkFoodPresent($preferences)== true){
+    
     addFood($PlaceObjectArray, $finalArray);
     addRemaining($PlaceObjectArray, $finalArray);
 }
@@ -264,7 +244,7 @@ else{
 }
 
 
-orderFinalArray();
+
 
 
 
